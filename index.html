@@ -1,5 +1,244 @@
 <!DOCTYPE html>
 <html lang="ru">
- //SOON
-</html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тёмный Портал</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Мерцание */
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+            25%, 75% { opacity: 0.9; }
+        }
+
+        .flicker {
+            animation: flicker 0.3s infinite;
+        }
+
+        /* Глаза */
+        .eye {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .eye::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .eye.active {
+            opacity: 1;
+        }
+
+        /* Центральный логотип */
+        .logo-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+
+        .strange-logo {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cube {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: rotate 8s infinite linear;
+        }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .face:nth-child(1) { transform: rotateY(0deg) translateZ(100px); }
+        .face:nth-child(2) { transform: rotateY(90deg) translateZ(100px); }
+        .face:nth-child(3) { transform: rotateY(180deg) translateZ(100px); }
+        .face:nth-child(4) { transform: rotateY(-90deg) translateZ(100px); }
+        .face:nth-child(5) { transform: rotateX(90deg) translateZ(100px); }
+        .face:nth-child(6) { transform: rotateX(-90deg) translateZ(100px); }
+
+        @keyframes rotate {
+            0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
+            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+        }
+
+        .inner-sphere {
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, #fff 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse 4s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.5); opacity: 0.1; }
+        }
+
+        /* Эффект мерцания для всего сайта */
+        .flicker-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="flicker-overlay" id="flickerOverlay"></div>
+    
+    <div class="logo-container">
+        <div class="strange-logo">
+            <div class="cube">
+                <div class="face">Ø</div>
+                <div class="face">∑</div>
+                <div class="face">∞</div>
+                <div class="face">∆</div>
+                <div class="face">∫</div>
+                <div class="face">∂</div>
+            </div>
+            <div class="inner-sphere"></div>
+        </div>
+    </div>
+
+    <script>
+        // Создание глаз по краям экрана
+        function createEyes() {
+            const edges = [
+                // верхний край
+                { x: '10%', y: '0%' }, { x: '30%', y: '0%' }, { x: '50%', y: '0%' }, { x: '70%', y: '0%' }, { x: '90%', y: '0%' },
+                // правый край
+                { x: '100%', y: '10%' }, { x: '100%', y: '30%' }, { x: '100%', y: '50%' }, { x: '100%', y: '70%' }, { x: '100%', y: '90%' },
+                // нижний край
+                { x: '10%', y: '100%' }, { x: '30%', y: '100%' }, { x: '50%', y: '100%' }, { x: '70%', y: '100%' }, { x: '90%', y: '100%' },
+                // левый край
+                { x: '0%', y: '10%' }, { x: '0%', y: '30%' }, { x: '0%', y: '50%' }, { x: '0%', y: '70%' }, { x: '0%', y: '90%' }
+            ];
+
+            edges.forEach(position => {
+                const eye = document.createElement('div');
+                eye.className = 'eye';
+                eye.style.left = position.x;
+                eye.style.top = position.y;
+                document.body.appendChild(eye);
+            });
+        }
+
+        // Анимация глаз
+        function animateEyes() {
+            const eyes = document.querySelectorAll('.eye');
+            
+            setInterval(() => {
+                // Случайное количество глаз для открытия (3-8)
+                const eyesToOpen = Math.floor(Math.random() * 6) + 3;
+                const shuffledEyes = Array.from(eyes).sort(() => 0.5 - Math.random());
+                
+                // Закрыть все глаза
+                eyes.forEach(eye => eye.classList.remove('active'));
+                
+                // Открыть случайные глаза
+                shuffledEyes.slice(0, eyesToOpen).forEach(eye => {
+                    eye.classList.add('active');
+                });
+                
+            }, 2000); // Каждые 2 секунды
+        }
+
+        // Эффект мерцания
+        function startFlickering() {
+            setInterval(() => {
+                if (Math.random() < 0.3) { // 30% chance of flicker
+                    const overlay = document.getElementById('flickerOverlay');
+                    overlay.style.opacity = '0.1';
+                    
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                    }, 50 + Math.random() * 100);
+                }
+            }, 3000); // Проверка каждые 3 секунды
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            createEyes();
+            animateEyes();
+            startFlickering();
+            
+            // Случайное мерцание body
+            setInterval(() => {
+                if (Math.random() < 0.2) {
+                    document.body.classList.add('flicker');
+                    setTimeout(() => {
+                        document.body.classList.remove('flicker');
+                    }, 300);
+                }
+            }, 5000);
+        });
+
+        // Интерактивность логотипа
+        document.querySelector('.strange-logo').addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1)';
+        });
+
+        document.querySelector('.strange-logo').addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    </script>
+</body>
+</html>
