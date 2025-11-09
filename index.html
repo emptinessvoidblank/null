@@ -18,6 +18,19 @@
             overflow: hidden;
             position: relative;
             min-height: 100vh;
+            cursor: none;
+        }
+
+        /* Кастомный курсор */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
         }
 
         /* Мерцание */
@@ -31,32 +44,52 @@
             animation: flicker 0.3s infinite;
         }
 
-        /* Глаза */
+        /* Страшные глаза */
         .eye {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 20px;
             background: #fff;
-            border-radius: 50%;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 1.5s ease;
             z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         .eye::before {
             content: '';
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 15px;
+            height: 15px;
             background: #000;
             border-radius: 50%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #333;
+            border-radius: 50%;
+            top: 30%;
+            left: 30%;
+            opacity: 0.7;
         }
 
         .eye.active {
-            opacity: 1;
+            opacity: 0.9;
+        }
+
+        .eye.active::before {
+            width: 18px;
+            height: 18px;
+            background: #111;
         }
 
         /* Центральный логотип */
@@ -73,6 +106,7 @@
             height: 200px;
             position: relative;
             cursor: pointer;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
         }
 
         .cube {
@@ -80,21 +114,21 @@
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            animation: rotate 8s infinite linear;
+            animation: rotate 15s infinite linear;
         }
 
         .face {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             font-weight: bold;
-            color: #fff;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .face:nth-child(1) { transform: rotateY(0deg) translateZ(100px); }
@@ -106,7 +140,7 @@
 
         @keyframes rotate {
             0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
-            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg); }
         }
 
         .inner-sphere {
@@ -115,7 +149,7 @@
             left: 25%;
             width: 50%;
             height: 50%;
-            background: radial-gradient(circle, #fff 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
             border-radius: 50%;
             opacity: 0.3;
             animation: pulse 4s infinite alternate;
@@ -138,9 +172,29 @@
             pointer-events: none;
             z-index: 1000;
         }
+
+        /* Текстовый эффект */
+        .title {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            animation: titleFlicker 8s infinite;
+        }
+
+        @keyframes titleFlicker {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.2; }
+            25%, 75% { opacity: 0.7; }
+        }
     </style>
 </head>
 <body>
+    <div class="cursor"></div>
     <div class="flicker-overlay" id="flickerOverlay"></div>
     
     <div class="logo-container">
@@ -157,18 +211,35 @@
         </div>
     </div>
 
+    <div class="title">вход запрещён</div>
+
     <script>
-        // Создание глаз по краям экрана
+        // Кастомный курсор
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Создание страшных глаз по краям экрана
         function createEyes() {
             const edges = [
                 // верхний край
-                { x: '10%', y: '0%' }, { x: '30%', y: '0%' }, { x: '50%', y: '0%' }, { x: '70%', y: '0%' }, { x: '90%', y: '0%' },
+                { x: '5%', y: '2%' }, { x: '15%', y: '1%' }, { x: '25%', y: '3%' }, { x: '35%', y: '2%' }, 
+                { x: '45%', y: '1%' }, { x: '55%', y: '3%' }, { x: '65%', y: '2%' }, { x: '75%', y: '1%' }, 
+                { x: '85%', y: '3%' }, { x: '95%', y: '2%' },
                 // правый край
-                { x: '100%', y: '10%' }, { x: '100%', y: '30%' }, { x: '100%', y: '50%' }, { x: '100%', y: '70%' }, { x: '100%', y: '90%' },
+                { x: '98%', y: '10%' }, { x: '99%', y: '20%' }, { x: '98%', y: '30%' }, { x: '99%', y: '40%' }, 
+                { x: '98%', y: '50%' }, { x: '99%', y: '60%' }, { x: '98%', y: '70%' }, { x: '99%', y: '80%' }, 
+                { x: '98%', y: '90%' },
                 // нижний край
-                { x: '10%', y: '100%' }, { x: '30%', y: '100%' }, { x: '50%', y: '100%' }, { x: '70%', y: '100%' }, { x: '90%', y: '100%' },
+                { x: '5%', y: '98%' }, { x: '15%', y: '99%' }, { x: '25%', y: '97%' }, { x: '35%', y: '98%' }, 
+                { x: '45%', y: '99%' }, { x: '55%', y: '97%' }, { x: '65%', y: '98%' }, { x: '75%', y: '99%' }, 
+                { x: '85%', y: '97%' }, { x: '95%', y: '98%' },
                 // левый край
-                { x: '0%', y: '10%' }, { x: '0%', y: '30%' }, { x: '0%', y: '50%' }, { x: '0%', y: '70%' }, { x: '0%', y: '90%' }
+                { x: '2%', y: '10%' }, { x: '1%', y: '20%' }, { x: '2%', y: '30%' }, { x: '1%', y: '40%' }, 
+                { x: '2%', y: '50%' }, { x: '1%', y: '60%' }, { x: '2%', y: '70%' }, { x: '1%', y: '80%' }, 
+                { x: '2%', y: '90%' }
             ];
 
             edges.forEach(position => {
@@ -176,6 +247,11 @@
                 eye.className = 'eye';
                 eye.style.left = position.x;
                 eye.style.top = position.y;
+                
+                // Случайный наклон глаз для большего реализма
+                const rotation = Math.floor(Math.random() * 30) - 15;
+                eye.style.transform = `rotate(${rotation}deg)`;
+                
                 document.body.appendChild(eye);
             });
         }
@@ -185,19 +261,40 @@
             const eyes = document.querySelectorAll('.eye');
             
             setInterval(() => {
-                // Случайное количество глаз для открытия (3-8)
-                const eyesToOpen = Math.floor(Math.random() * 6) + 3;
+                // Случайное количество глаз для открытия (5-12)
+                const eyesToOpen = Math.floor(Math.random() * 8) + 5;
                 const shuffledEyes = Array.from(eyes).sort(() => 0.5 - Math.random());
                 
                 // Закрыть все глаза
-                eyes.forEach(eye => eye.classList.remove('active'));
+                eyes.forEach(eye => {
+                    eye.classList.remove('active');
+                    // Случайное мерцание закрытых глаз
+                    if (Math.random() < 0.1) {
+                        setTimeout(() => {
+                            eye.style.opacity = '0.3';
+                            setTimeout(() => {
+                                eye.style.opacity = '0';
+                            }, 100);
+                        }, Math.random() * 500);
+                    }
+                });
                 
                 // Открыть случайные глаза
                 shuffledEyes.slice(0, eyesToOpen).forEach(eye => {
                     eye.classList.add('active');
+                    
+                    // Случайное мерцание открытых глаз
+                    if (Math.random() < 0.2) {
+                        setTimeout(() => {
+                            eye.style.opacity = '0.5';
+                            setTimeout(() => {
+                                eye.style.opacity = '0.9';
+                            }, 150);
+                        }, Math.random() * 1000);
+                    }
                 });
                 
-            }, 2000); // Каждые 2 секунды
+            }, 1500); // Каждые 1.5 секунды
         }
 
         // Эффект мерцания
@@ -229,15 +326,48 @@
                     }, 300);
                 }
             }, 5000);
+            
+            // Случайные звуковые эффекты (психологическое воздействие)
+            setInterval(() => {
+                if (Math.random() < 0.1) {
+                    // В реальном проекте здесь были бы звуковые файлы
+                    console.log("*шепот*");
+                }
+            }, 10000);
         });
 
         // Интерактивность логотипа
         document.querySelector('.strange-logo').addEventListener('mouseenter', function() {
             this.style.transform = 'scale(1.1)';
+            this.style.filter = 'drop-shadow(0 0 15px rgba(255, 255, 255, 0.5))';
         });
 
         document.querySelector('.strange-logo').addEventListener('mouseleave', function() {
             this.style.transform = 'scale(1)';
+            this.style.filter = 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))';
+        });
+
+        // Глаза следят за курсором
+        document.addEventListener('mousemove', (e) => {
+            const eyes = document.querySelectorAll('.eye.active');
+            eyes.forEach(eye => {
+                const eyeRect = eye.getBoundingClientRect();
+                const eyeX = eyeRect.left + eyeRect.width / 2;
+                const eyeY = eyeRect.top + eyeRect.height / 2;
+                
+                const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
+                const distance = Math.min(5, Math.sqrt(
+                    Math.pow(e.clientX - eyeX, 2) + Math.pow(e.clientY - eyeY, 2)
+                ) / 50);
+                
+                const pupil = eye.querySelector('::before');
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                
+                // Используем псевдоэлемент через CSS переменные
+                eye.style.setProperty('--pupil-x', `${x}px`);
+                eye.style.setProperty('--pupil-y', `${y}px`);
+            });
         });
     </script>
 </body>
