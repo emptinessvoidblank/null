@@ -19,6 +19,7 @@
             position: relative;
             min-height: 100vh;
             cursor: none;
+            transition: background-color 1s ease;
         }
 
         /* Кастомный курсор */
@@ -191,133 +192,99 @@
             50% { opacity: 0.2; }
             25%, 75% { opacity: 0.7; }
         }
+
+        /* Таймер (можно скрыть через display: none) */
+        .timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="cursor"></div>
     <div class="flicker-overlay" id="flickerOverlay"></div>
     
-    <div class="logo-container">
-        <div class="strange-logo">
-            <div class="cube">
-                <div class="face">Ø</div>
-                <div class="face">∑</div>
-                <div class="face">∞</div>
-                <div class="face">∆</div>
-                <div class="face">∫</div>
-                <div class="face">∂</div>
+    <!-- Таймер -->
+    <div class="timer" id="timer">Ожидание...</div>
+
+    <!-- Основной контент (будет скрыт после 12 часов) -->
+    <div id="content">
+        <div class="logo-container">
+            <div class="strange-logo">
+                <div class="cube">
+                    <div class="face">Ø</div>
+                    <div class="face">∑</div>
+                    <div class="face">∞</div>
+                    <div class="face">∆</div>
+                    <div class="face">∫</div>
+                    <div class="face">∂</div>
+                </div>
+                <div class="inner-sphere"></div>
             </div>
-            <div class="inner-sphere"></div>
         </div>
+
+        <div class="title">вход запрещён</div>
     </div>
 
-    <div class="title">вход запрещён</div>
-
     <script>
-        // Кастомный курсор
-        const cursor = document.querySelector('.cursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
+        const DURATION = 12 * 60 * 60 * 1000; // 12 часов в миллисекундах
+        const startTimeKey = 'portal_start_time';
+        const content = document.getElementById('content');
+        const timerDisplay = document.getElementById('timer');
 
-        // Создание страшных глаз по краям экрана
-        function createEyes() {
-            const edges = [
-                // верхний край
-                { x: '5%', y: '2%' }, { x: '15%', y: '1%' }, { x: '25%', y: '3%' }, { x: '35%', y: '2%' }, 
-                { x: '45%', y: '1%' }, { x: '55%', y: '3%' }, { x: '65%', y: '2%' }, { x: '75%', y: '1%' }, 
-                { x: '85%', y: '3%' }, { x: '95%', y: '2%' },
-                // правый край
-                { x: '98%', y: '10%' }, { x: '99%', y: '20%' }, { x: '98%', y: '30%' }, { x: '99%', y: '40%' }, 
-                { x: '98%', y: '50%' }, { x: '99%', y: '60%' }, { x: '98%', y: '70%' }, { x: '99%', y: '80%' }, 
-                { x: '98%', y: '90%' },
-                // нижний край
-                { x: '5%', y: '98%' }, { x: '15%', y: '99%' }, { x: '25%', y: '97%' }, { x: '35%', y: '98%' }, 
-                { x: '45%', y: '99%' }, { x: '55%', y: '97%' }, { x: '65%', y: '98%' }, { x: '75%', y: '99%' }, 
-                { x: '85%', y: '97%' }, { x: '95%', y: '98%' },
-                // левый край
-                { x: '2%', y: '10%' }, { x: '1%', y: '20%' }, { x: '2%', y: '30%' }, { x: '1%', y: '40%' }, 
-                { x: '2%', y: '50%' }, { x: '1%', y: '60%' }, { x: '2%', y: '70%' }, { x: '1%', y: '80%' }, 
-                { x: '2%', y: '90%' }
-            ];
-
-            edges.forEach(position => {
-                const eye = document.createElement('div');
-                eye.className = 'eye';
-                eye.style.left = position.x;
-                eye.style.top = position.y;
-                
-                // Случайный наклон глаз для большего реализма
-                const rotation = Math.floor(Math.random() * 30) - 15;
-                eye.style.transform = `rotate(${rotation}deg)`;
-                
-                document.body.appendChild(eye);
-            });
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
         }
 
-        // Анимация глаз
-        function animateEyes() {
-            const eyes = document.querySelectorAll('.eye');
-            
-            setInterval(() => {
-                // Случайное количество глаз для открытия (5-12)
-                const eyesToOpen = Math.floor(Math.random() * 8) + 5;
-                const shuffledEyes = Array.from(eyes).sort(() => 0.5 - Math.random());
-                
-                // Закрыть все глаза
-                eyes.forEach(eye => {
-                    eye.classList.remove('active');
-                    // Случайное мерцание закрытых глаз
-                    if (Math.random() < 0.1) {
-                        setTimeout(() => {
-                            eye.style.opacity = '0.3';
-                            setTimeout(() => {
-                                eye.style.opacity = '0';
-                            }, 100);
-                        }, Math.random() * 500);
-                    }
-                });
-                
-                // Открыть случайные глаза
-                shuffledEyes.slice(0, eyesToOpen).forEach(eye => {
-                    eye.classList.add('active');
-                    
-                    // Случайное мерцание открытых глаз
-                    if (Math.random() < 0.2) {
-                        setTimeout(() => {
-                            eye.style.opacity = '0.5';
-                            setTimeout(() => {
-                                eye.style.opacity = '0.9';
-                            }, 150);
-                        }, Math.random() * 1000);
-                    }
-                });
-                
-            }, 1500); // Каждые 1.5 секунды
+        function checkTimer() {
+            let startTime = localStorage.getItem(startTimeKey);
+
+            if (!startTime) {
+                // Первый запуск — сохраняем текущее время
+                startTime = Date.now();
+                localStorage.setItem(startTimeKey, startTime);
+            } else {
+                startTime = Number(startTime);
+            }
+
+            const elapsed = Date.now() - startTime;
+            const remaining = DURATION - elapsed;
+
+            if (remaining <= 0) {
+                // Таймер закончился
+                content.style.display = 'none'; // Скрываем всё
+                document.body.style.backgroundColor = '#000';
+                timerDisplay.textContent = 'ИСТЕКЛО';
+                return;
+            }
+
+            // Обновляем таймер
+            timerDisplay.textContent = formatTime(remaining);
+
+            // Запускаем обновление каждую секунду
+            setTimeout(checkTimer, 1000);
         }
 
-        // Эффект мерцания
-        function startFlickering() {
-            setInterval(() => {
-                if (Math.random() < 0.3) { // 30% chance of flicker
-                    const overlay = document.getElementById('flickerOverlay');
-                    overlay.style.opacity = '0.1';
-                    
-                    setTimeout(() => {
-                        overlay.style.opacity = '0';
-                    }, 50 + Math.random() * 100);
-                }
-            }, 3000); // Проверка каждые 3 секунды
-        }
-
-        // Инициализация
+        // Запускаем проверку таймера при загрузке
         document.addEventListener('DOMContentLoaded', () => {
+            checkTimer();
+
+            // Остальные эффекты (глаза, мерцание и т.д.)
             createEyes();
             animateEyes();
             startFlickering();
-            
-            // Случайное мерцание body
+
             setInterval(() => {
                 if (Math.random() < 0.2) {
                     document.body.classList.add('flicker');
@@ -326,14 +293,77 @@
                     }, 300);
                 }
             }, 5000);
-            
-            // Случайные звуковые эффекты (психологическое воздействие)
+        });
+
+        // === Оригинальные функции из вашего кода ниже ===
+
+        function createEyes() {
+            const edges = [
+                { x: '5%', y: '2%' }, { x: '15%', y: '1%' }, { x: '25%', y: '3%' }, { x: '35%', y: '2%' },
+                { x: '45%', y: '1%' }, { x: '55%', y: '3%' }, { x: '65%', y: '2%' }, { x: '75%', y: '1%' },
+                { x: '85%', y: '3%' }, { x: '95%', y: '2%' },
+                { x: '98%', y: '10%' }, { x: '99%', y: '20%' }, { x: '98%', y: '30%' }, { x: '99%', y: '40%' },
+                { x: '98%', y: '50%' }, { x: '99%', y: '60%' }, { x: '98%', y: '70%' }, { x: '99%', y: '80%' },
+                { x: '98%', y: '90%' },
+                { x: '5%', y: '98%' }, { x: '15%', y: '99%' }, { x: '25%', y: '97%' }, { x: '35%', y: '98%' },
+                { x: '45%', y: '99%' }, { x: '55%', y: '97%' }, { x: '65%', y: '98%' }, { x: '75%', y: '99%' },
+                { x: '85%', y: '97%' }, { x: '95%', y: '98%' },
+                { x: '2%', y: '10%' }, { x: '1%', y: '20%' }, { x: '2%', y: '30%' }, { x: '1%', y: '40%' },
+                { x: '2%', y: '50%' }, { x: '1%', y: '60%' }, { x: '2%', y: '70%' }, { x: '1%', y: '80%' },
+                { x: '2%', y: '90%' }
+            ];
+
+            edges.forEach(position => {
+                const eye = document.createElement('div');
+                eye.className = 'eye';
+                eye.style.left = position.x;
+                eye.style.top = position.y;
+                const rotation = Math.floor(Math.random() * 30) - 15;
+                eye.style.transform = `rotate(${rotation}deg)`;
+                document.body.appendChild(eye);
+            });
+        }
+
+        function animateEyes() {
+            const eyes = document.querySelectorAll('.eye');
             setInterval(() => {
-                if (Math.random() < 0.1) {
-                    // В реальном проекте здесь были бы звуковые файлы
-                    console.log("*шепот*");
+                const eyesToOpen = Math.floor(Math.random() * 8) + 5;
+                const shuffledEyes = Array.from(eyes).sort(() => 0.5 - Math.random());
+                eyes.forEach(eye => eye.classList.remove('active'));
+                shuffledEyes.slice(0, eyesToOpen).forEach(eye => eye.classList.add('active'));
+            }, 1500);
+        }
+
+        function startFlickering() {
+            setInterval(() => {
+                if (Math.random() < 0.3) {
+                    const overlay = document.getElementById('flickerOverlay');
+                    overlay.style.opacity = '0.1';
+                    setTimeout(() => overlay.style.opacity = '0', 50 + Math.random() * 100);
                 }
-            }, 10000);
+            }, 3000);
+        }
+
+        // Глаза следят за курсором
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.querySelector('.cursor');
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+
+            const eyes = document.querySelectorAll('.eye.active');
+            eyes.forEach(eye => {
+                const rect = eye.getBoundingClientRect();
+                const eyeX = rect.left + rect.width / 2;
+                const eyeY = rect.top + rect.height / 2;
+                const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
+                const distance = Math.min(5, Math.sqrt(
+                    Math.pow(e.clientX - eyeX, 2) + Math.pow(e.clientY - eyeY, 2)
+                ) / 50);
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                eye.style.setProperty('--pupil-x', `${x}px`);
+                eye.style.setProperty('--pupil-y', `${y}px`);
+            });
         });
 
         // Интерактивность логотипа
@@ -345,29 +375,6 @@
         document.querySelector('.strange-logo').addEventListener('mouseleave', function() {
             this.style.transform = 'scale(1)';
             this.style.filter = 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))';
-        });
-
-        // Глаза следят за курсором
-        document.addEventListener('mousemove', (e) => {
-            const eyes = document.querySelectorAll('.eye.active');
-            eyes.forEach(eye => {
-                const eyeRect = eye.getBoundingClientRect();
-                const eyeX = eyeRect.left + eyeRect.width / 2;
-                const eyeY = eyeRect.top + eyeRect.height / 2;
-                
-                const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
-                const distance = Math.min(5, Math.sqrt(
-                    Math.pow(e.clientX - eyeX, 2) + Math.pow(e.clientY - eyeY, 2)
-                ) / 50);
-                
-                const pupil = eye.querySelector('::before');
-                const x = Math.cos(angle) * distance;
-                const y = Math.sin(angle) * distance;
-                
-                // Используем псевдоэлемент через CSS переменные
-                eye.style.setProperty('--pupil-x', `${x}px`);
-                eye.style.setProperty('--pupil-y', `${y}px`);
-            });
         });
     </script>
 </body>
