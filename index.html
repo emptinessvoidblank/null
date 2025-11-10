@@ -22,7 +22,7 @@
             transition: background-color 1s ease;
         }
 
-        /* Кастомный курсор */
+
         .cursor {
             position: fixed;
             width: 20px;
@@ -34,7 +34,7 @@
             mix-blend-mode: difference;
         }
 
-        /* Мерцание */
+
         @keyframes flicker {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
@@ -45,7 +45,7 @@
             animation: flicker 0.3s infinite;
         }
 
-        /* Страшные глаза */
+ 
         .eye {
             position: absolute;
             width: 40px;
@@ -93,7 +93,7 @@
             background: #111;
         }
 
-        /* Центральный логотип */
+
         .logo-container {
             position: absolute;
             top: 50%;
@@ -161,7 +161,6 @@
             100% { transform: scale(1.5); opacity: 0.1; }
         }
 
-        /* Эффект мерцания для всего сайта */
         .flicker-overlay {
             position: fixed;
             top: 0;
@@ -174,7 +173,7 @@
             z-index: 1000;
         }
 
-        /* Текстовый эффект */
+
         .title {
             position: absolute;
             bottom: 20px;
@@ -193,12 +192,12 @@
             25%, 75% { opacity: 0.7; }
         }
 
-        /* Таймер (можно скрыть через display: none) */
+  
         .timer {
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 12px;
+            font-size: 22px;
             color: rgba(255, 255, 255, 0.6);
             z-index: 1000;
             background: rgba(0, 0, 0, 0.5);
@@ -211,10 +210,10 @@
     <div class="cursor"></div>
     <div class="flicker-overlay" id="flickerOverlay"></div>
     
-    <!-- Таймер -->
+
     <div class="timer" id="timer">Ожидание...</div>
 
-    <!-- Основной контент (будет скрыт после 12 часов) -->
+
     <div id="content">
         <div class="logo-container">
             <div class="strange-logo">
@@ -234,7 +233,7 @@
     </div>
 
     <script>
-        const DURATION = 12 * 60 * 60 * 1000; // 12 часов в миллисекундах
+        const DURATION = 12 * 60 * 60 * 1000; 
         const startTimeKey = 'portal_start_time';
         const content = document.getElementById('content');
         const timerDisplay = document.getElementById('timer');
@@ -251,7 +250,7 @@
             let startTime = localStorage.getItem(startTimeKey);
 
             if (!startTime) {
-                // Первый запуск — сохраняем текущее время
+               
                 startTime = Date.now();
                 localStorage.setItem(startTimeKey, startTime);
             } else {
@@ -262,25 +261,25 @@
             const remaining = DURATION - elapsed;
 
             if (remaining <= 0) {
-                // Таймер закончился
-                content.style.display = 'none'; // Скрываем всё
+                
+                content.style.display = 'none'; 
                 document.body.style.backgroundColor = '#000';
                 timerDisplay.textContent = 'ИСТЕКЛО';
                 return;
             }
 
-            // Обновляем таймер
+            
             timerDisplay.textContent = formatTime(remaining);
 
-            // Запускаем обновление каждую секунду
+            
             setTimeout(checkTimer, 1000);
         }
 
-        // Запускаем проверку таймера при загрузке
+        
         document.addEventListener('DOMContentLoaded', () => {
             checkTimer();
 
-            // Остальные эффекты (глаза, мерцание и т.д.)
+            
             createEyes();
             animateEyes();
             startFlickering();
@@ -295,7 +294,7 @@
             }, 5000);
         });
 
-        // === Оригинальные функции из вашего кода ниже ===
+        
 
         function createEyes() {
             const edges = [
@@ -344,7 +343,7 @@
             }, 3000);
         }
 
-        // Глаза следят за курсором
+        
         document.addEventListener('mousemove', (e) => {
             const cursor = document.querySelector('.cursor');
             cursor.style.left = e.clientX + 'px';
@@ -366,7 +365,7 @@
             });
         });
 
-        // Интерактивность логотипа
+        
         document.querySelector('.strange-logo').addEventListener('mouseenter', function() {
             this.style.transform = 'scale(1.1)';
             this.style.filter = 'drop-shadow(0 0 15px rgba(255, 255, 255, 0.5))';
