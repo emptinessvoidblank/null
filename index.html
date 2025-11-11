@@ -19,9 +19,50 @@
             position: relative;
             min-height: 100vh;
             cursor: none;
-            transition: background-color 1s ease;
+            transition: all 0.3s ease;
         }
 
+        body.shaking {
+            animation: shake 0.5s linear infinite;
+        }
+
+        body.glitching {
+            animation: glitch 0.3s infinite;
+        }
+
+        body.heavy-glitching {
+            animation: heavyGlitch 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            10% { transform: translateX(-2px) translateY(-1px); }
+            20% { transform: translateX(2px) translateY(1px); }
+            30% { transform: translateX(-3px) translateY(-2px); }
+            40% { transform: translateX(3px) translateY(2px); }
+            50% { transform: translateX(-2px) translateY(-1px); }
+            60% { transform: translateX(2px) translateY(1px); }
+            70% { transform: translateX(-1px) translateY(-1px); }
+            80% { transform: translateX(1px) translateY(1px); }
+            90% { transform: translateX(-1px) translateY(0); }
+        }
+
+        @keyframes glitch {
+            0% { transform: translateX(0); filter: hue-rotate(0deg); }
+            25% { transform: translateX(-2px); filter: hue-rotate(45deg); }
+            50% { transform: translateX(2px); filter: hue-rotate(90deg); }
+            75% { transform: translateX(-1px); filter: hue-rotate(135deg); }
+            100% { transform: translateX(0); filter: hue-rotate(180deg); }
+        }
+
+        @keyframes heavyGlitch {
+            0% { transform: translateX(0) skew(0deg); filter: hue-rotate(0deg) brightness(1.2); }
+            20% { transform: translateX(-5px) skew(2deg); filter: hue-rotate(90deg) brightness(1.5); }
+            40% { transform: translateX(5px) skew(-2deg); filter: hue-rotate(180deg) brightness(0.8); }
+            60% { transform: translateX(-3px) skew(1deg); filter: hue-rotate(270deg) brightness(1.3); }
+            80% { transform: translateX(3px) skew(-1deg); filter: hue-rotate(360deg) brightness(0.9); }
+            100% { transform: translateX(0) skew(0deg); filter: hue-rotate(0deg) brightness(1); }
+        }
 
         .cursor {
             position: fixed;
@@ -34,6 +75,26 @@
             mix-blend-mode: difference;
         }
 
+        .play-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 40px;
+            font-size: 24px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
 
         @keyframes flicker {
             0%, 100% { opacity: 1; }
@@ -45,7 +106,6 @@
             animation: flicker 0.3s infinite;
         }
 
- 
         .eye {
             position: absolute;
             width: 40px;
@@ -53,7 +113,7 @@
             background: #fff;
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
             opacity: 0;
-            transition: opacity 1.5s ease;
+            transition: all 3s ease;
             z-index: 10;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
@@ -68,7 +128,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
+            transition: all 2s ease;
         }
 
         .eye::after {
@@ -87,80 +147,210 @@
             opacity: 0.9;
         }
 
-        .eye.active::before {
-            width: 18px;
-            height: 18px;
-            background: #111;
+        .eye.corrupted {
+            background: #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+            border-radius: 40% 40% 40% 40% / 50% 50% 50% 50%;
+            transform: scale(1.2);
         }
 
+        .eye.melting {
+            border-radius: 30% 30% 40% 40% / 40% 40% 50% 50%;
+            transform: scale(1.1) rotate(5deg);
+            filter: blur(1px);
+        }
 
-        .logo-container {
+        .video-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 100;
+            width: 640px;
+            height: 360px;
+            z-index: 50;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            transition: all 5s ease;
         }
 
-        .strange-logo {
-            width: 200px;
-            height: 200px;
-            position: relative;
-            cursor: pointer;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        .video-container.cracking {
+            border-color: rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
         }
 
-        .cube {
-            position: absolute;
+        .video-container.heavy-cracking {
+            border: 3px solid rgba(255, 0, 0, 0.8);
+            box-shadow: 0 0 100px rgba(255, 0, 0, 0.6);
+            animation: containerPulse 1s infinite;
+        }
+
+        .video-container.dissolving {
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            overflow: visible;
+            animation: dissolve 10s forwards;
+        }
+
+        @keyframes containerPulse {
+            0%, 100% { box-shadow: 0 0 100px rgba(255, 0, 0, 0.6); }
+            50% { box-shadow: 0 0 150px rgba(255, 0, 0, 0.9); }
+        }
+
+        @keyframes dissolve {
+            0% { 
+                border: 2px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            }
+            100% { 
+                border: 2px solid transparent;
+                box-shadow: 0 0 0 transparent;
+                background: transparent;
+            }
+        }
+
+        .video-container.broken {
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+
+        #mainVideo {
             width: 100%;
             height: 100%;
-            transform-style: preserve-3d;
-            animation: rotate 15s infinite linear;
+            object-fit: cover;
+            transition: all 3s ease;
         }
 
-        .face {
+        .crack {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 51;
+            pointer-events: none;
+            opacity: 0;
         }
 
-        .face:nth-child(1) { transform: rotateY(0deg) translateZ(100px); }
-        .face:nth-child(2) { transform: rotateY(90deg) translateZ(100px); }
-        .face:nth-child(3) { transform: rotateY(180deg) translateZ(100px); }
-        .face:nth-child(4) { transform: rotateY(-90deg) translateZ(100px); }
-        .face:nth-child(5) { transform: rotateX(90deg) translateZ(100px); }
-        .face:nth-child(6) { transform: rotateX(-90deg) translateZ(100px); }
-
-        @keyframes rotate {
-            0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
-            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg); }
+        .crack-1 {
+            width: 2px;
+            height: 100px;
+            top: 50px;
+            left: 30%;
+            transform: rotate(15deg);
         }
 
-        .inner-sphere {
+        .crack-2 {
+            width: 2px;
+            height: 120px;
+            top: 80px;
+            left: 60%;
+            transform: rotate(-10deg);
+        }
+
+        .crack-3 {
+            width: 2px;
+            height: 80px;
+            bottom: 60px;
+            right: 40%;
+            transform: rotate(5deg);
+        }
+
+        .hand {
             position: absolute;
-            top: 25%;
-            left: 25%;
-            width: 50%;
-            height: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            width: 180px;
+            height: 350px;
+            background: #000;
+            z-index: 60;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) scale(0);
+            opacity: 0;
+            transition: transform 3s ease, opacity 2s ease;
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.7),
+                inset 0 0 30px rgba(139, 0, 0, 0.5);
+            overflow: hidden;
+            clip-path: polygon(
+                0% 15%, 5% 10%, 15% 5%, 25% 0%, 35% 2%, 
+                45% 5%, 55% 8%, 65% 10%, 75% 12%, 85% 13%, 
+                95% 12%, 100% 10%, 95% 20%, 90% 30%, 85% 40%, 
+                80% 50%, 75% 60%, 70% 70%, 65% 80%, 60% 90%, 
+                55% 95%, 50% 100%, 45% 95%, 40% 90%, 35% 85%, 
+                30% 80%, 25% 75%, 20% 70%, 15% 65%, 10% 60%, 
+                5% 55%, 0% 50%, 0% 40%, 0% 30%, 0% 20%
+            );
+            
+            filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.7));
+        }
+
+        .hand::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(139, 0, 0, 0.7) 0%, transparent 20%),
+                radial-gradient(circle at 70% 40%, rgba(139, 0, 0, 0.5) 0%, transparent 25%),
+                radial-gradient(circle at 50% 80%, rgba(139, 0, 0, 0.6) 0%, transparent 30%);
+            mix-blend-mode: overlay;
+        }
+
+        
+        .hand::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, transparent 40%, rgba(139, 0, 0, 0.3) 50%, transparent 60%),
+                linear-gradient(-45deg, transparent 40%, rgba(139, 0, 0, 0.2) 50%, transparent 60%);
+            mix-blend-mode: overlay;
+            border-radius: 5px;
+        }
+
+        .hand.grabbing {
+            opacity: 0.7;
+            transform: translateX(-50%) scale(0.6);
+            animation: grab 3s ease-in-out infinite;
+        }
+
+        .hand.emerging {
+            opacity: 0.9;
+            transform: translateX(-50%) scale(0.8);
+            top: 50%;
+        }
+
+        .hand.attacking {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(2.5);
+            opacity: 0.8;
+            transition: all 4s ease;
+            mix-blend-mode: overlay;
+        }
+
+        @keyframes grab {
+            0%, 100% { transform: translateX(-50%) scale(0.6) rotate(0deg); }
+            50% { transform: translateX(-50%) scale(0.65) rotate(1deg); }
+        }
+
+        
+        .blood {
+            position: absolute;
+            background: rgba(139, 0, 0, 0.7);
             border-radius: 50%;
-            opacity: 0.3;
-            animation: pulse 4s infinite alternate;
+            z-index: 55;
+            pointer-events: none;
+            opacity: 0;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.3; }
-            100% { transform: scale(1.5); opacity: 0.1; }
-        }
-
+        
         .flicker-overlay {
             position: fixed;
             top: 0;
@@ -173,7 +363,75 @@
             z-index: 1000;
         }
 
+        
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 0, 0.1) 0%, 
+                rgba(0, 255, 0, 0.1) 50%, 
+                rgba(0, 0, 255, 0.1) 100%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 800;
+            mix-blend-mode: overlay;
+        }
 
+        .glitch-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            z-index: 801;
+        }
+
+        
+        .screen-crack {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 30% 30%, transparent 20%, rgba(255, 255, 255, 0.1) 21%, transparent 22%),
+                radial-gradient(circle at 70% 70%, transparent 20%, rgba(255, 255, 255, 0.1) 21%, transparent 22%);
+            z-index: 900;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        
+        .shadow-figure {
+            position: fixed;
+            width: 200px;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 40;
+            opacity: 0;
+            transition: all 3s ease;
+            filter: blur(10px);
+        }
+
+        
+        .distortion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.8) 70%);
+            z-index: 700;
+            pointer-events: none;
+            opacity: 0;
+            mix-blend-mode: multiply;
+        }
+
+        
         .title {
             position: absolute;
             bottom: 20px;
@@ -184,6 +442,7 @@
             color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
             animation: titleFlicker 8s infinite;
+            z-index: 70;
         }
 
         @keyframes titleFlicker {
@@ -192,124 +451,332 @@
             25%, 75% { opacity: 0.7; }
         }
 
-  
-        .timer {
+        
+        .warning {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 22px;
-            color: rgba(255, 255, 255, 0.6);
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 4px;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            color: rgba(255, 0, 0, 0.7);
+            text-transform: uppercase;
+            z-index: 70;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .warning.show {
+            opacity: 1;
+        }
+
+        
+        .console {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            padding: 40px;
+            font-size: 18px;
+            line-height: 1.4;
+            color: #00ff00;
+            overflow: auto;
+        }
+
+        .console.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .console-line {
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .console-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #00ff00;
+            margin-left: 5px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            margin: 20px 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: #00ff00;
+            transition: width 0.5s ease;
+        }
+
+        
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 600;
+        }
+
+        .noise::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.05;
         }
     </style>
 </head>
 <body>
+    
+    <div class="play-button" id="playButton">▶ PLAY</div>
+    
     <div class="cursor"></div>
     <div class="flicker-overlay" id="flickerOverlay"></div>
+    <div class="glitch-overlay" id="glitchOverlay"></div>
+    <div class="screen-crack" id="screenCrack"></div>
+    <div class="noise" id="noise"></div>
+    <div class="distortion" id="distortion"></div>
     
+    
+    <div class="shadow-figure" id="shadow1"></div>
+    <div class="shadow-figure" id="shadow2"></div>
+    <div class="shadow-figure" id="shadow3"></div>
+    
+    <div class="warning" id="warning">ОБНАРУЖЕНА АНОМАЛИЯ</div>
+    
+    <div class="video-container" id="videoContainer">
+        
+        <video id="mainVideo" loop muted>
+            <source src="video/IHATEYOU.mp4" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+        </video>
+        
+        
+        <div class="crack crack-1"></div>
+        <div class="crack crack-2"></div>
+        <div class="crack crack-3"></div>
+    </div>
+    
+    
+    <div class="hand" id="hand"></div>
 
-    <div class="timer" id="timer">Ожидание...</div>
+    <div class="title">СИСТЕМА НАБЛЮДЕНИЯ АКТИВНА</div>
 
-
-    <div id="content">
-        <div class="logo-container">
-            <div class="strange-logo">
-                <div class="cube">
-                    <div class="face">Ø</div>
-                    <div class="face">∑</div>
-                    <div class="face">∞</div>
-                    <div class="face">∆</div>
-                    <div class="face">∫</div>
-                    <div class="face">∂</div>
-                </div>
-                <div class="inner-sphere"></div>
-            </div>
+    
+    <div class="console" id="console">
+        <div class="console-line" id="line1">> ИНИЦИАЛИЗАЦИЯ ПРОТОКОЛА ОЧИСТКИ...</div>
+        <div class="console-line" id="line2">> СКАНИРОВАНИЕ СИСТЕМЫ...</div>
+        <div class="console-line" id="line3">> ОБНАРУЖЕНА АНОМАЛИЯ УРОВНЯ 5...</div>
+        <div class="console-line" id="line4">> АКТИВАЦИЯ КОНТЕН-МЕХАНИЗМОВ...</div>
+        <div class="console-line" id="line5">> ЗАФИКСИРОВАНО ОШИБОК: <span id="errorCount">0</span>/4664</div>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
         </div>
-
-        <div class="title">вход запрещён</div>
+        <div class="console-line" id="line6">> УСТРАНЕНИЕ УГРОЗЫ...</div>
+        <div class="console-line" id="line7">> ПРОТОКОЛ ОЧИСТКИ ВЫПОЛНЕН</div>
+        <div class="console-line" id="line8">> УГРОЗА УСТРАНЕНА</div>
+        <div class="console-line" id="line9">> СИСТЕМА СТАБИЛИЗИРОВАНА</div>
+        <div class="console-line" id="line10">> УСТРАНЕНО ОШИБОК: 4663/4664</div>
+        <div class="console-line" id="line11">> ОСТАЛАСЬ 1 НЕКРИТИЧЕСКАЯ ОШИБКА</div>
+        <div class="console-line" id="line12">> СИСТЕМА ГОТОВА К РАБОТЕ Enter<span class="console-cursor"></span></div>
     </div>
 
     <script>
-        const DURATION = 12 * 60 * 60 * 1000; 
-        const startTimeKey = 'portal_start_time';
-        const content = document.getElementById('content');
-        const timerDisplay = document.getElementById('timer');
+        
+        const video = document.getElementById('mainVideo');
+        const videoContainer = document.getElementById('videoContainer');
+        const hand = document.getElementById('hand');
+        const warning = document.getElementById('warning');
+        const cracks = document.querySelectorAll('.crack');
+        const glitchOverlay = document.getElementById('glitchOverlay');
+        const consoleElement = document.getElementById('console');
+        const playButton = document.getElementById('playButton');
+        const screenCrack = document.getElementById('screenCrack');
+        const noise = document.getElementById('noise');
+        const distortion = document.getElementById('distortion');
+        const shadows = [
+            document.getElementById('shadow1'),
+            document.getElementById('shadow2'),
+            document.getElementById('shadow3')
+        ];
+        const body = document.body;
 
-        function formatTime(ms) {
-            const totalSeconds = Math.floor(ms / 1000);
-            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-            const seconds = String(totalSeconds % 60).padStart(2, '0');
-            return `${hours}:${minutes}:${seconds}`;
-        }
+        let phase = 0;
+        let timer = null;
+        let isSoundEnabled = false;
+        let experienceStarted = false;
+        let consoleSound = null;
 
-        function checkTimer() {
-            let startTime = localStorage.getItem(startTimeKey);
-
-            if (!startTime) {
-               
-                startTime = Date.now();
-                localStorage.setItem(startTimeKey, startTime);
-            } else {
-                startTime = Number(startTime);
-            }
-
-            const elapsed = Date.now() - startTime;
-            const remaining = DURATION - elapsed;
-
-            if (remaining <= 0) {
+        
+        function startExperience() {
+            if (experienceStarted) return;
+            experienceStarted = true;
+            
+            
+            playButton.style.display = 'none';
+            
+            
+            video.play().then(() => {
+                console.log("Видео запущено");
                 
-                content.style.display = 'none'; 
-                document.body.style.backgroundColor = '#000';
-                timerDisplay.textContent = 'ИСТЕКЛО';
-                return;
-            }
-
+                
+                startEffectsTimer();
+                
+            }).catch(error => {
+                console.log("Ошибка воспроизведения:", error);
+            });
             
-            timerDisplay.textContent = formatTime(remaining);
-
             
-            setTimeout(checkTimer, 1000);
+            document.addEventListener('click', enableSound, { once: true });
         }
 
         
-        document.addEventListener('DOMContentLoaded', () => {
-            checkTimer();
-
+        function enableSound() {
+            if (isSoundEnabled) return;
+            isSoundEnabled = true;
             
-            createEyes();
-            animateEyes();
-            startFlickering();
-
-            setInterval(() => {
-                if (Math.random() < 0.2) {
-                    document.body.classList.add('flicker');
-                    setTimeout(() => {
-                        document.body.classList.remove('flicker');
-                    }, 300);
+            
+            video.muted = false;
+            video.volume = 0.1;
+            
+            
+            let volumeInterval = setInterval(() => {
+                if (video.volume < 0.5) {
+                    video.volume += 0.04;
+                } else {
+                    clearInterval(volumeInterval);
                 }
-            }, 5000);
-        });
+            }, 1000);
+        }
 
         
+        function startEffectsTimer() {
+            
+            setTimeout(() => {
+                phase = 1;
+                warning.classList.add('show');
+                activateNoise(0.1);
+            }, 3000);
 
+            
+            setTimeout(() => {
+                phase = 2;
+                body.classList.add('shaking');
+                corruptEyes(1);
+                activateShadows(1);
+            }, 6000);
+
+            
+            setTimeout(() => {
+                phase = 3;
+                videoContainer.classList.add('cracking');
+                cracks.forEach(crack => {
+                    crack.style.opacity = '0.5';
+                });
+                corruptEyes(2);
+                activateGlitch(1);
+                activateNoise(0.2);
+            }, 12000);
+
+            
+            setTimeout(() => {
+                phase = 4;
+                videoContainer.classList.add('dissolving');
+                activateDistortion(0.3);
+            }, 15000);
+
+            
+            setTimeout(() => {
+                phase = 5;
+                hand.classList.add('grabbing');
+                corruptEyes(3);
+                activateGlitch(2);
+                activateShadows(2);
+            }, 18000);
+
+            
+            setTimeout(() => {
+                phase = 6;
+                hand.classList.remove('grabbing');
+                hand.classList.add('emerging');
+                videoContainer.classList.add('heavy-cracking');
+                corruptEyes(4);
+                activateGlitch(3);
+                activateNoise(0.4);
+                
+                
+                screenCrack.style.opacity = '0.3';
+            }, 24000);
+
+            
+            setTimeout(() => {
+                phase = 7;
+                videoContainer.classList.add('broken');
+                hand.classList.add('attacking');
+                corruptEyes(6);
+                activateGlitch(5);
+                video.style.opacity = '0.3';
+                activateNoise(0.7);
+                activateDistortion(0.8);
+                
+                
+                screenCrack.style.opacity = '0.7';
+                
+                
+                createInteractiveEffects();
+            }, 30000);
+
+            
+            setTimeout(() => {
+                phase = 8;
+                showConsole();
+            }, 35500); 
+        }
+
+        
         function createEyes() {
             const edges = [
-                { x: '5%', y: '2%' }, { x: '15%', y: '1%' }, { x: '25%', y: '3%' }, { x: '35%', y: '2%' },
-                { x: '45%', y: '1%' }, { x: '55%', y: '3%' }, { x: '65%', y: '2%' }, { x: '75%', y: '1%' },
-                { x: '85%', y: '3%' }, { x: '95%', y: '2%' },
-                { x: '98%', y: '10%' }, { x: '99%', y: '20%' }, { x: '98%', y: '30%' }, { x: '99%', y: '40%' },
-                { x: '98%', y: '50%' }, { x: '99%', y: '60%' }, { x: '98%', y: '70%' }, { x: '99%', y: '80%' },
-                { x: '98%', y: '90%' },
-                { x: '5%', y: '98%' }, { x: '15%', y: '99%' }, { x: '25%', y: '97%' }, { x: '35%', y: '98%' },
-                { x: '45%', y: '99%' }, { x: '55%', y: '97%' }, { x: '65%', y: '98%' }, { x: '75%', y: '99%' },
-                { x: '85%', y: '97%' }, { x: '95%', y: '98%' },
-                { x: '2%', y: '10%' }, { x: '1%', y: '20%' }, { x: '2%', y: '30%' }, { x: '1%', y: '40%' },
-                { x: '2%', y: '50%' }, { x: '1%', y: '60%' }, { x: '2%', y: '70%' }, { x: '1%', y: '80%' },
-                { x: '2%', y: '90%' }
+                { x: '5%', y: '2%' }, { x: '15%', y: '1%' }, { x: '25%', y: '3%' }, 
+                { x: '35%', y: '2%' }, { x: '45%', y: '1%' }, { x: '55%', y: '3%' }, 
+                { x: '65%', y: '2%' }, { x: '75%', y: '1%' }, { x: '85%', y: '3%' }, 
+                { x: '95%', y: '2%' }, { x: '98%', y: '10%' }, { x: '99%', y: '20%' }, 
+                { x: '98%', y: '30%' }, { x: '99%', y: '40%' }, { x: '98%', y: '50%' }, 
+                { x: '99%', y: '60%' }, { x: '98%', y: '70%' }, { x: '99%', y: '80%' }, 
+                { x: '98%', y: '90%' }, { x: '5%', y: '98%' }, { x: '15%', y: '99%' }, 
+                { x: '25%', y: '97%' }, { x: '35%', y: '98%' }, { x: '45%', y: '99%' }, 
+                { x: '55%', y: '97%' }, { x: '65%', y: '98%' }, { x: '75%', y: '99%' }, 
+                { x: '85%', y: '97%' }, { x: '95%', y: '98%' }, { x: '2%', y: '10%' }, 
+                { x: '1%', y: '20%' }, { x: '2%', y: '30%' }, { x: '1%', y: '40%' }, 
+                { x: '2%', y: '50%' }, { x: '1%', y: '60%' }, { x: '2%', y: '70%' }, 
+                { x: '1%', y: '80%' }, { x: '2%', y: '90%' }
             ];
 
             edges.forEach(position => {
@@ -317,63 +784,367 @@
                 eye.className = 'eye';
                 eye.style.left = position.x;
                 eye.style.top = position.y;
+                
                 const rotation = Math.floor(Math.random() * 30) - 15;
                 eye.style.transform = `rotate(${rotation}deg)`;
+                
                 document.body.appendChild(eye);
             });
         }
 
-        function animateEyes() {
+        
+        function corruptEyes(phase) {
             const eyes = document.querySelectorAll('.eye');
-            setInterval(() => {
-                const eyesToOpen = Math.floor(Math.random() * 8) + 5;
-                const shuffledEyes = Array.from(eyes).sort(() => 0.5 - Math.random());
-                eyes.forEach(eye => eye.classList.remove('active'));
-                shuffledEyes.slice(0, eyesToOpen).forEach(eye => eye.classList.add('active'));
-            }, 1500);
+            const activeCount = Math.min(eyes.length, 5 + phase * 3);
+            const shuffledEyes = Array.from(eyes).sort(() => 0.5 - Math.random());
+            
+            eyes.forEach(eye => eye.classList.remove('active', 'corrupted', 'melting'));
+            
+            shuffledEyes.slice(0, activeCount).forEach((eye, index) => {
+                eye.classList.add('active');
+                
+                if (phase >= 3) {
+                    eye.classList.add('corrupted');
+                }
+                if (phase >= 6) {
+                    eye.classList.add('melting');
+                }
+            });
         }
 
+        
+        function activateShadows(intensity) {
+            shadows.forEach((shadow, index) => {
+                shadow.style.opacity = 0.3 * intensity;
+                
+                
+                if (index === 0) {
+                    shadow.style.left = '10%';
+                    shadow.style.top = '20%';
+                } else if (index === 1) {
+                    shadow.style.right = '15%';
+                    shadow.style.bottom = '30%';
+                } else {
+                    shadow.style.left = '70%';
+                    shadow.style.top = '60%';
+                }
+                
+                
+                shadow.style.animation = `shadowMove${index+1} ${10 - intensity*2}s infinite alternate`;
+            });
+            
+            
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes shadowMove1 {
+                    0% { transform: translateY(0) scale(1); }
+                    100% { transform: translateY(-20px) scale(1.1); }
+                }
+                @keyframes shadowMove2 {
+                    0% { transform: translateX(0) scale(1); }
+                    100% { transform: translateX(15px) scale(1.05); }
+                }
+                @keyframes shadowMove3 {
+                    0% { transform: translate(0, 0) scale(1); }
+                    100% { transform: translate(-10px, 10px) scale(1.08); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        
+        function activateNoise(intensity) {
+            noise.style.opacity = intensity;
+        }
+
+        
+        function activateDistortion(intensity) {
+            distortion.style.opacity = intensity;
+        }
+
+        
         function startFlickering() {
             setInterval(() => {
                 if (Math.random() < 0.3) {
                     const overlay = document.getElementById('flickerOverlay');
                     overlay.style.opacity = '0.1';
-                    setTimeout(() => overlay.style.opacity = '0', 50 + Math.random() * 100);
+                    
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                    }, 50 + Math.random() * 100);
                 }
             }, 3000);
         }
 
         
-        document.addEventListener('mousemove', (e) => {
-            const cursor = document.querySelector('.cursor');
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+        function createGlitchLines() {
+            for (let i = 0; i < 10; i++) {
+                const line = document.createElement('div');
+                line.className = 'glitch-line';
+                line.style.top = `${Math.random() * 100}%`;
+                line.style.opacity = '0';
+                document.body.appendChild(line);
+            }
+        }
 
-            const eyes = document.querySelectorAll('.eye.active');
-            eyes.forEach(eye => {
-                const rect = eye.getBoundingClientRect();
-                const eyeX = rect.left + rect.width / 2;
-                const eyeY = rect.top + rect.height / 2;
-                const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
-                const distance = Math.min(5, Math.sqrt(
-                    Math.pow(e.clientX - eyeX, 2) + Math.pow(e.clientY - eyeY, 2)
-                ) / 50);
-                const x = Math.cos(angle) * distance;
-                const y = Math.sin(angle) * distance;
-                eye.style.setProperty('--pupil-x', `${x}px`);
-                eye.style.setProperty('--pupil-y', `${y}px`);
+        
+        function activateGlitch(intensity = 1) {
+            if (intensity > 3) {
+                body.classList.add('heavy-glitching');
+            } else if (intensity > 1) {
+                body.classList.add('glitching');
+            }
+            
+            glitchOverlay.style.opacity = 0.1 * intensity;
+            
+            const lines = document.querySelectorAll('.glitch-line');
+            lines.forEach(line => {
+                if (Math.random() < intensity * 0.3) {
+                    line.style.opacity = '0.7';
+                    line.style.top = `${Math.random() * 100}%`;
+                    setTimeout(() => {
+                        line.style.opacity = '0';
+                    }, 100 + Math.random() * 200);
+                }
             });
+            
+            if (intensity > 2) {
+                createBlood(intensity);
+            }
+        }
+
+        
+        function createBlood(intensity) {
+            for (let i = 0; i < intensity * 5; i++) {
+                const blood = document.createElement('div');
+                blood.className = 'blood';
+                blood.style.width = `${3 + Math.random() * 8}px`;
+                blood.style.height = `${3 + Math.random() * 8}px`;
+                blood.style.left = `${Math.random() * 100}%`;
+                blood.style.top = `${Math.random() * 100}%`;
+                blood.style.opacity = '0.8';
+                document.body.appendChild(blood);
+                
+                setTimeout(() => {
+                    blood.remove();
+                }, 3000);
+            }
+        }
+
+        
+        function createInteractiveEffects() {
+            
+            document.addEventListener('mousemove', function(e) {
+                if (phase >= 6) {
+                    const cursor = document.querySelector('.cursor');
+                    const handRect = hand.getBoundingClientRect();
+                    const cursorRect = cursor.getBoundingClientRect();
+                    
+                    
+                    if (
+                        cursorRect.left < handRect.right &&
+                        cursorRect.right > handRect.left &&
+                        cursorRect.top < handRect.bottom &&
+                        cursorRect.bottom > handRect.top
+                    ) {
+                        
+                        hand.style.transform = `translate(-50%, -50%) scale(2.5) translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`;
+                        
+                        
+                        const blood = document.createElement('div');
+                        blood.className = 'blood';
+                        blood.style.width = '15px';
+                        blood.style.height = '15px';
+                        blood.style.left = e.clientX + 'px';
+                        blood.style.top = e.clientY + 'px';
+                        blood.style.opacity = '0.9';
+                        document.body.appendChild(blood);
+                        
+                        setTimeout(() => {
+                            blood.remove();
+                        }, 1000);
+                    }
+                }
+            });
+            
+            
+            document.addEventListener('click', function(e) {
+                if (phase >= 6) {
+                    
+                    const crack = document.createElement('div');
+                    crack.className = 'crack';
+                    crack.style.width = '2px';
+                    crack.style.height = '50px';
+                    crack.style.left = e.clientX + 'px';
+                    crack.style.top = e.clientY + 'px';
+                    crack.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    crack.style.opacity = '0.8';
+                    document.body.appendChild(crack);
+                    
+                    setTimeout(() => {
+                        crack.remove();
+                    }, 2000);
+                }
+            });
+        }
+
+        
+        function createConsoleSound() {
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            
+            const oscillator = audioContext.createOscillator();
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(80, audioContext.currentTime);
+            
+            
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(200, audioContext.currentTime);
+            
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            
+            
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            
+            oscillator.start();
+            
+            
+            setInterval(() => {
+                oscillator.frequency.setValueAtTime(80 + Math.random() * 40, audioContext.currentTime);
+                filter.frequency.setValueAtTime(150 + Math.random() * 100, audioContext.currentTime);
+            }, 500);
+            
+            return { oscillator, gainNode, audioContext };
+        }
+
+        
+        function downloadFile() {
+            const element = document.createElement('a');
+            const file = new Blob(['не слушай его, зелёные цифры твои друзья'], { type: 'text/plain' });
+            element.href = URL.createObjectURL(file);
+            element.download = 'seeyoulater.txt';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        
+        function showConsole() {
+            
+            video.pause();
+            video.currentTime = 0;
+            
+            
+            body.className = '';
+            video.style.display = 'none';
+            videoContainer.style.display = 'none';
+            hand.style.display = 'none';
+            warning.style.display = 'none';
+            document.querySelector('.title').style.display = 'none';
+            screenCrack.style.display = 'none';
+            noise.style.display = 'none';
+            distortion.style.display = 'none';
+            shadows.forEach(shadow => shadow.style.display = 'none');
+            
+            
+            consoleSound = createConsoleSound();
+            
+            
+            consoleElement.classList.add('active');
+            
+            
+            const lines = document.querySelectorAll('.console-line');
+            const errorCount = document.getElementById('errorCount');
+            const progress = document.getElementById('progress');
+            
+            let currentLine = 0;
+            let errors = 0;
+            const totalErrors = 4664;
+            
+            function showNextLine() {
+                if (currentLine < lines.length) {
+                    setTimeout(() => {
+                        lines[currentLine].style.opacity = '1';
+                        lines[currentLine].style.transform = 'translateY(0)';
+                        lines[currentLine].style.transition = 'all 0.5s ease';
+                        
+                        if (currentLine === 4) { 
+                            const errorInterval = setInterval(() => {
+                                errors += Math.floor(Math.random() * 100) + 50;
+                                if (errors >= totalErrors) {
+                                    errors = totalErrors;
+                                    clearInterval(errorInterval);
+                                    progress.style.width = '100%';
+                                    setTimeout(showNextLine, 500);
+                                }
+                                errorCount.textContent = errors;
+                                progress.style.width = `${(errors / totalErrors) * 100}%`;
+                            }, 50);
+                        } else {
+                            setTimeout(showNextLine, 800);
+                        }
+                        
+                        
+                        if (currentLine === lines.length - 1) {
+                            const handleEnter = function(e) {
+                                if (e.key === 'Enter') {
+                                    
+                                    if (consoleSound) {
+                                        consoleSound.oscillator.stop();
+                                        consoleSound.audioContext.close();
+                                    }
+                                    
+                                    
+                                    downloadFile();
+                                    
+                                    
+                                    window.close();
+                                    
+                                    
+                                    document.removeEventListener('keydown', handleEnter);
+                                }
+                            };
+                            
+                            document.addEventListener('keydown', handleEnter);
+                        }
+                        
+                        currentLine++;
+                    }, currentLine === 0 ? 500 : 0);
+                }
+            }
+            
+            showNextLine();
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            createEyes();
+            startFlickering();
+            createGlitchLines();
+            
+            
+            video.addEventListener('error', function(e) {
+                console.error("Ошибка загрузки видео:", e);
+                warning.textContent = "ОШИБКА ЗАГРУЗКИ ВИДЕО";
+            });
+            
+            
+            playButton.addEventListener('click', startExperience);
         });
 
         
-        document.querySelector('.strange-logo').addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.1)';
-            this.style.filter = 'drop-shadow(0 0 15px rgba(255, 255, 255, 0.5))';
-        });
-
-        document.querySelector('.strange-logo').addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-            this.style.filter = 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))';
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
         });
     </script>
 </body>
